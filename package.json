@@ -1,0 +1,29 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "[![Actions Status](https://github.com/myxtaridse/js-async-project-4/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/myxtaridse/js-async-project-4/actions)",
+  "homepage": "https://github.com/myxtaridse/js-async-project-4#readme",
+  "bugs": {
+    "url": "https://github.com/myxtaridse/js-async-project-4/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myxtaridse/js-async-project-4.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0"
+  },
+  "dependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "jest": "^30.4.2"
+  }
+}
