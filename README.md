@@ -1,2 +1,2 @@
 ### Hexlet tests and linter status:
-[![Actions Status](https://github.com/myxtaridse/js-async-project-4/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/myxtaridse/js-async-project-4/actions)
+[![Actions Status](https://github.com/myxtaridse/js-async-project-4/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/myxtaridse/js-async-project-4/actions)[![test-check](https://github.com/myxtaridse/js-async-project-4/actions/workflows/test-check.yml/badge.svg)](https://github.com/myxtaridse/js-async-project-4/actions/workflows/test-check.yml)[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=myxtaridse_js-async-project-4&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=myxtaridse_js-async-project-4)
