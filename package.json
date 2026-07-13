@@ -15,7 +15,7 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
