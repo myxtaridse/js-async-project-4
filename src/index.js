@@ -8,10 +8,8 @@ const parseUrl = (targetUrl) => {
   return href.replace(/[^A-Za-z0-9]/g, '-')
 }
 
-const getFileSrc = (targetUrl, srcImg) => {
-  const hostUrl = new URL(targetUrl).host
-  const filepath = `${hostUrl}${srcImg}`.replace(/(?!\.[^.]*$)[^A-Za-z0-9]/g, '-')
-  return filepath
+const getFileSrc = (srcUrl) => {
+  return `${srcUrl.host}${srcUrl.pathname}`.replace(/(?!\.[^.]*$)[^A-Za-z0-9]/g, '-')
 }
 
 export default (targetUrl, outputDir = process.cwd()) => {
@@ -26,16 +24,15 @@ export default (targetUrl, outputDir = process.cwd()) => {
       // модифицируем данные
       const $ = cheerio.load(data)
       const srcImg = $('img').attr('src') // src
-      const changeSrc = getFileSrc(targetUrl, srcImg) // измененный src
+      const srcUrl = new URL(srcImg, targetUrl)
+      const changeSrc = getFileSrc(srcUrl)
 
       $('img').attr('src', `${dirnameFiles}/${changeSrc}`)
       const modifiedHtml = $.html()
 
-      const imgUrl = (new URL(targetUrl)).origin + srcImg
-
       // если каталога не существует, добавляем
       return mkdir(dirpathFiles, { recursive: true })
-        .then(() => axios.get(imgUrl, { responseType: 'arraybuffer' }))
+        .then(() => axios.get(srcUrl, { responseType: 'arraybuffer' }))
         .then(res => writeFile(join(dirpathFiles, changeSrc), res.data))
         .then(() => modifiedHtml)
     })
