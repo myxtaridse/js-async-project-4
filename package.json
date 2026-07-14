@@ -14,6 +14,9 @@
   "author": "",
   "type": "module",
   "main": "src/index.js",
+  "bin": {
+    "page-loader": "bin/page-loader.js"
+  },
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules npx jest"
   },
@@ -25,6 +28,8 @@
   },
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
+    "axios": "^1.18.1",
+    "commander": "^15.0.0",
     "jest": "^30.4.2"
   }
 }
