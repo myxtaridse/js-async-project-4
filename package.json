@@ -20,7 +20,8 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.6.0",
-    "globals": "^17.7.0"
+    "globals": "^17.7.0",
+    "nock": "^14.0.16"
   },
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
