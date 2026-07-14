@@ -29,6 +29,7 @@
   "dependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "axios": "^1.18.1",
+    "cheerio": "^1.2.0",
     "commander": "^15.0.0",
     "jest": "^30.4.2"
   }
