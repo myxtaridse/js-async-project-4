@@ -31,7 +31,7 @@ describe('page-loader', () => {
     nock(href).get('/assets/professions/nodejs.png').reply(200, expectedImg)
 
     // запрос на запись данных страницы в файл
-    expect(reqTargetUrl(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath) // тут просто проверяем путь, ничего не меняется
+    await expect(reqTargetUrl(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath) // тут просто проверяем путь, ничего не меняется
 
     await expect(readFile(expectedFilePath, 'utf-8')).resolves.toBe(expectedBody) // должны записываться измененные данные
 

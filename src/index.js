@@ -1,15 +1,22 @@
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import { mkdir, writeFile } from 'fs/promises'
-import { join } from 'path'
+import { extname, join } from 'path'
+
+const filesForModified = [
+  { tagname: 'script', attr: 'src', responseType: 'text' },
+  { tagname: 'link', attr: 'href', responseType: 'text' },
+  { tagname: 'img', attr: 'src', responseType: 'arraybuffer' },
+]
 
 const parseUrl = (targetUrl) => {
   const href = targetUrl.replace(/https?:\/\//, '')
   return href.replace(/[^A-Za-z0-9]/g, '-')
 }
 
-const getFileSrc = (srcUrl) => {
-  return `${srcUrl.host}${srcUrl.pathname}`.replace(/(?!\.[^.]*$)[^A-Za-z0-9]/g, '-')
+const getChangeAttr = (srcUrl) => {
+  const pathname = extname(srcUrl.pathname) === '' ? `${srcUrl.pathname}.html` : srcUrl.pathname
+  return `${srcUrl.host}${pathname}`.replace(/(?!\.[^.]*$)[^A-Za-z0-9]/g, '-')
 }
 
 export default (targetUrl, outputDir = process.cwd()) => {
@@ -21,22 +28,28 @@ export default (targetUrl, outputDir = process.cwd()) => {
 
   return axios.get(targetUrl)
     .then(({ data }) => {
-      // модифицируем данные
       const $ = cheerio.load(data)
-      const srcImg = $('img').attr('src') // src
-      const srcUrl = new URL(srcImg, targetUrl)
-      const changeSrc = getFileSrc(srcUrl)
+      const downloadPromises = [] // чтобы все операции завершились применим Promise.all
+      filesForModified.forEach(({ tagname, attr, responseType }) => {
+        $(tagname).each((i, element) => {
+          const attribute = $(element).attr(attr)
+          const resourceUrl = new URL(attribute, targetUrl)
 
-      $('img').attr('src', `${dirnameFiles}/${changeSrc}`)
-      const modifiedHtml = $.html()
+          const targetUrlHost = (new URL(targetUrl)).host // для проверки на текущий хост
+          if (resourceUrl.host !== targetUrlHost) return
 
-      // если каталога не существует, добавляем
+          const changeAttr = getChangeAttr(resourceUrl)
+          $(element).attr(attr, `${dirnameFiles}/${changeAttr}`)
+
+          const downloadPromise = axios.get(resourceUrl, { responseType })
+            .then(res => writeFile(join(dirpathFiles, changeAttr), res.data))
+
+          downloadPromises.push(downloadPromise)
+        })
+      })
       return mkdir(dirpathFiles, { recursive: true })
-        .then(() => axios.get(srcUrl, { responseType: 'arraybuffer' }))
-        .then(res => writeFile(join(dirpathFiles, changeSrc), res.data))
-        .then(() => modifiedHtml)
-    })
-    .then((data) => {
-      return writeFile(dataFilepath, data).then(() => dataFilepath)
+        .then(() => Promise.all(downloadPromises))
+        .then(() => $.html())
+        .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => dataFilepath))
     })
 }
