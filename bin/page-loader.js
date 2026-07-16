@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { program } from 'commander'
 import reqTargetUrl from '../src/index.js'
+import debug from 'debug'
+
+const log = debug('page-loader')
 
 program
   .name('page-loader')
@@ -10,7 +13,7 @@ program
   .argument('<targetUrl>')
   .action((targetUrl, { output }) => {
     reqTargetUrl(targetUrl, output)
-      .then(filepath => console.log(filepath))
+      .then(filepath => log(filepath))
   })
 
 program.parse()

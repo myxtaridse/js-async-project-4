@@ -1,4 +1,8 @@
 import axios from 'axios'
+import axiosDebugLog from 'axios-debug-log'
+
+axiosDebugLog.addLogger(axios)
+
 import * as cheerio from 'cheerio'
 import { mkdir, writeFile } from 'fs/promises'
 import { extname, join } from 'path'
@@ -33,6 +37,7 @@ export default (targetUrl, outputDir = process.cwd()) => {
       filesForModified.forEach(({ tagname, attr, responseType }) => {
         $(tagname).each((i, element) => {
           const attribute = $(element).attr(attr)
+          if (!attribute) return
           const resourceUrl = new URL(attribute, targetUrl)
 
           const targetUrlHost = (new URL(targetUrl)).host // для проверки на текущий хост
@@ -51,5 +56,5 @@ export default (targetUrl, outputDir = process.cwd()) => {
         .then(() => Promise.all(downloadPromises))
         .then(() => $.html())
         .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => dataFilepath))
-    })
+    }).catch(err => console.log(err.message, 'err'))
 }
