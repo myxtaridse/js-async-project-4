@@ -14,6 +14,10 @@ program
   .action((targetUrl, { output }) => {
     reqTargetUrl(targetUrl, output)
       .then(filepath => log(filepath))
+      .catch((err) => {
+        console.error(`Ошибка: ${err.message}`)
+        process.exit(1)
+      })
   })
 
 program.parse()
