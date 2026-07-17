@@ -68,7 +68,7 @@ export default (targetUrl, outputDir) => {
             createTask(resource, dirpathFiles)),
         { concurrent: true, exitOnError: false })
 
-      return mkdir(dirpathFiles, { recursive: true })
+      return mkdir(dirpathFiles)
         .then(() => tasks.run())
         .then(() => $.html())
         .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => dataFilepath))
