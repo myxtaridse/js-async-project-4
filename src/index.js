@@ -15,12 +15,6 @@ const filesForModified = [
 ]
 
 export default (targetUrl, outputDir = process.cwd()) => {
-  try {
-    new URL(targetUrl)
-  }
-  catch (err) {
-    return Promise.reject(new Error(`Ссылка ${targetUrl} является синтаксически неверной. Попробуйте переписать ее.`, { cause: err }))
-  }
   const filename = parseUrl(targetUrl)
   const dataFilepath = join(outputDir, `${filename}.html`)
 
@@ -80,9 +74,6 @@ export default (targetUrl, outputDir = process.cwd()) => {
         // ! проверка на существование директории и прав на нее
         .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => dataFilepath))
     }).catch((err) => {
-      if (err.code === 'EACCES') {
-        throw new Error(`Не удалось скачать данные в директорию ${outputDir}: либо директории не существует, либо нет прав на запись в нее.`, { cause: err })
-      }
       if (axios.isAxiosError(err)) {
         if (err.response) {
           throw new Error(`Страницы по адресу ${targetUrl} не существует. Попробуйте переписать адрес.`, { cause: err })
