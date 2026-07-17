@@ -18,3 +18,11 @@ page-loader -o <outputDir> <targetUrl>
 ```
 
 [![asciicast](https://asciinema.org/a/ZSepKqUSXs99RgNI.svg)](https://asciinema.org/a/ZSepKqUSXs99RgNI)
+
+## Demonstration of page loading and local files with progress display
+
+[![asciicast](https://asciinema.org/a/S93H5Z9JpzulWO1O.svg)](https://asciinema.org/a/S93H5Z9JpzulWO1O)
+
+## Error handling and correct shutdown
+
+[![asciicast](https://asciinema.org/a/rXLYGTui7EK7rUDb.svg)](https://asciinema.org/a/rXLYGTui7EK7rUDb)
