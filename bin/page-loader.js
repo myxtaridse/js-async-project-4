@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 import { program } from 'commander'
 import reqTargetUrl from '../src/index.js'
-import debug from 'debug'
-
-const log = debug('page-loader')
 
 program
   .name('page-loader')
@@ -13,7 +10,7 @@ program
   .argument('<targetUrl>')
   .action((targetUrl, { output }) => {
     reqTargetUrl(targetUrl, output)
-      .then(filepath => log(filepath))
+      .then(filepath => console.log(`Page was successfully downloaded into '${filepath}'`))
       .catch((err) => {
         console.error(`Ошибка: ${err.message}`)
         process.exit(1)
