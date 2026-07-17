@@ -52,7 +52,7 @@ const createTask = ({ tagname, attribute, responseType, resourceUrl, changeAttr 
   task: () => downloadResource(resourceUrl, join(dirpathFiles, changeAttr), tagname, attribute, responseType),
 })
 
-export default (targetUrl, outputDir = process.cwd()) => {
+export default (targetUrl, outputDir) => {
   const filename = parseUrl(targetUrl)
   const dataFilepath = join(outputDir, `${filename}.html`)
 

@@ -11,7 +11,7 @@ program
   .name('page-loader')
   .description('')
   .version('1.0.0')
-  .option('-o, --output [dir]', 'output dir', '/home/user/current-dir')
+  .option('-o, --output [dir]', 'output dir', process.cwd())
   .argument('<targetUrl>')
   .action(async (targetUrl, { output }) => {
     const resolvedOutput = resolve(output)
