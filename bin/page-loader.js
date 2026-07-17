@@ -2,8 +2,7 @@
 import { program } from 'commander'
 import { resolve } from 'path'
 import reqTargetUrl from '../src/index.js'
-import { access } from 'fs/promises'
-import { constants } from 'fs'
+import { stat } from 'fs/promises'
 
 const thenLog = filepath => `Page was successfully downloaded into '${filepath}'`
 const catchLog = message => `Ошибка: ${message}`
@@ -18,10 +17,13 @@ program
     const resolvedOutput = resolve(output)
     try {
       new URL(targetUrl)
-      await access(resolvedOutput, constants.W_OK)
+      const stats = await stat(resolvedOutput)
+      if (!stats.isDirectory()) {
+        throw new Error()
+      }
     }
     catch (err) {
-      if (err.code === 'EACCES') {
+      if (err.code === 'EACCES' || err.code === 'ENOENT') {
         console.error(catchLog(`Директория ${resolvedOutput} не существует или недоступна для записи.`))
       }
       else if (err.code === 'ERR_INVALID_URL') {
@@ -29,7 +31,7 @@ program
       }
       process.exit(1)
     }
-    reqTargetUrl(targetUrl, output)
+    reqTargetUrl(targetUrl, resolvedOutput)
       .then(filepath => console.log(thenLog(filepath)))
       .catch((err) => {
         console.error(catchLog(err.message))
