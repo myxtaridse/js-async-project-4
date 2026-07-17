@@ -52,8 +52,9 @@ const createTask = ({ tagname, attribute, responseType, resourceUrl, changeAttr 
   task: () => downloadResource(resourceUrl, join(dirpathFiles, changeAttr), tagname, attribute, responseType),
 })
 
-export default (targetUrl, outputDir) => {
+export default (targetUrl, outputDir = process.cwd()) => {
   const filename = parseUrl(targetUrl)
+  console.log(typeof outputDir, process.cwd())
   const dataFilepath = join(outputDir, `${filename}.html`)
 
   const dirnameFiles = `${filename}_files` // папка файлов
