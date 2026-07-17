@@ -1,11 +1,12 @@
+import { join } from 'node:path'
+import { mkdir, writeFile } from 'node:fs/promises'
+
 import axios from 'axios'
 import axiosDebugLog from 'axios-debug-log'
 axiosDebugLog.addLogger(axios)
 
 import * as cheerio from 'cheerio'
-import { mkdir, writeFile } from 'fs/promises'
 import Listr from 'listr'
-import { join } from 'path'
 import { getChangeAttr, parseUrl } from './utils.js'
 
 const filesForModified = [
@@ -13,6 +14,43 @@ const filesForModified = [
   { tagname: 'link', attr: 'href', responseType: 'text' },
   { tagname: 'img', attr: 'src', responseType: 'arraybuffer' },
 ]
+
+const getResources = ($, targetUrl, dirnameFiles) => {
+  const recources = []
+  const targetUrlHost = (new URL(targetUrl)).host
+  filesForModified.forEach(({ tagname, attr, responseType }) => {
+    $(tagname).each((i, element) => {
+      const attribute = $(element).attr(attr)
+      if (!attribute) return
+
+      let resourceUrl
+      try {
+        resourceUrl = new URL(attribute, targetUrl)
+      }
+      catch {
+        console.warn(`Не удалось скачать ресурс тега <${tagname}> из-за некорректного URL адресу "${attribute}"`)
+        return
+      }
+      if (resourceUrl.host !== targetUrlHost) return
+
+      const changeAttr = getChangeAttr(resourceUrl)
+      $(element).attr(attr, `${dirnameFiles}/${changeAttr}`)
+
+      recources.push({ tagname, attribute, responseType, resourceUrl, changeAttr })
+    })
+  })
+  return recources
+}
+const downloadResource = (resourceUrl, pathname, tagname, attribute, responseType) =>
+  axios.get(resourceUrl, { responseType })
+    .then(res => writeFile(pathname, res.data))
+    .catch(() => {
+      console.warn(`Не удалось скачать ресурс тега <${tagname}> по URL адресу "${attribute}", поскольку его не существует`)
+    })
+const createTask = ({ tagname, attribute, responseType, resourceUrl, changeAttr }, dirpathFiles) => ({
+  title: resourceUrl.href,
+  task: () => downloadResource(resourceUrl, join(dirpathFiles, changeAttr), tagname, attribute, responseType),
+})
 
 export default (targetUrl, outputDir = process.cwd()) => {
   const filename = parseUrl(targetUrl)
@@ -24,54 +62,15 @@ export default (targetUrl, outputDir = process.cwd()) => {
   return axios.get(targetUrl)
     .then(({ data }) => {
       const $ = cheerio.load(data)
-      const downloadPromises = [] // чтобы все операции завершились применим Promise.all
-      filesForModified.forEach(({ tagname, attr, responseType }) => {
-        $(tagname).each((i, element) => {
-          const attribute = $(element).attr(attr)
-          if (!attribute) return
-          let resourceUrl
-          try {
-            resourceUrl = new URL(attribute, targetUrl)
-          }
-          catch {
-            console.warn(`Не удалось скачать ресурс тега <${tagname}> из-за некорректного URL адресу "${attribute}"`)
-            return
-          }
-
-          const targetUrlHost = (new URL(targetUrl)).host // для проверки на текущий хост
-          if (resourceUrl.host !== targetUrlHost) return
-
-          const changeAttr = getChangeAttr(resourceUrl)
-          $(element).attr(attr, `${dirnameFiles}/${changeAttr}`)
-
-          downloadPromises.push({
-            tagname,
-            attribute,
-            responseType,
-            resourceUrl,
-            changeAttr,
-          })
-        })
-      })
-      const tasks = new Listr(downloadPromises.map(({ tagname, attribute, responseType, resourceUrl, changeAttr }) => ({
-        title: resourceUrl.href,
-        task: () => axios.get(resourceUrl, { responseType })
-          .then(res => writeFile(join(dirpathFiles, changeAttr), res.data))
-          .catch(() => {
-            console.warn(`Не удалось скачать ресурс тега <${tagname}> по URL адресу "${attribute}", поскольку его не существует`)
-            // return null
-          }),
-      })),
-      {
-        concurrent: true,
-        exitOnError: false,
-      },
-      )
+      const tasks = new Listr(
+        getResources($, targetUrl, dirnameFiles)
+          .map(resource =>
+            createTask(resource, dirpathFiles)),
+        { concurrent: true, exitOnError: false })
 
       return mkdir(dirpathFiles, { recursive: true })
         .then(() => tasks.run())
         .then(() => $.html())
-        // ! проверка на существование директории и прав на нее
         .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => dataFilepath))
     }).catch((err) => {
       if (axios.isAxiosError(err)) {

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
+import { resolve } from 'node:path'
+import { stat } from 'node:fs/promises'
 import { program } from 'commander'
-import { resolve } from 'path'
 import reqTargetUrl from '../src/index.js'
-import { stat } from 'fs/promises'
 
 const thenLog = filepath => `Page was successfully downloaded into '${filepath}'`
 const catchLog = message => `Ошибка: ${message}`
@@ -13,7 +13,7 @@ program
   .version('1.0.0')
   .option('-o, --output [dir]', 'output dir', '/home/user/current-dir')
   .argument('<targetUrl>')
-  .action(async (targetUrl = '', { output }) => {
+  .action(async (targetUrl, { output }) => {
     const resolvedOutput = resolve(output)
     try {
       new URL(targetUrl)
