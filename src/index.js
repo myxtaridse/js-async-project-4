@@ -10,8 +10,8 @@ import Listr from 'listr'
 import { getChangeAttr, parseUrl } from './utils.js'
 
 const filesForModified = [
-  { tagname: 'script', attr: 'src', responseType: 'text' },
-  { tagname: 'link', attr: 'href', responseType: 'text' },
+  { tagname: 'script', attr: 'src', responseType: 'arraybuffer' },
+  { tagname: 'link', attr: 'href', responseType: 'arraybuffer' },
   { tagname: 'img', attr: 'src', responseType: 'arraybuffer' },
 ]
 
