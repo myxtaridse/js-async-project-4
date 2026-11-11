@@ -7,7 +7,7 @@ const catchLog = message => `Ошибка: ${message}`
 
 program
   .name('page-loader')
-  .description('')
+  .description('Page loader utility')
   .version('1.0.0')
   .option('-o, --output [dir]', 'output dir', process.cwd())
   .argument('<targetUrl>')
