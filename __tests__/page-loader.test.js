@@ -34,7 +34,7 @@ describe('page-loader', () => {
     nock(href).get('/assets/professions/nodejs.png').reply(200, expectedImg)
 
     // проверка полученного пути
-    await expect(pageLoader(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath)
+    await expect(pageLoader(targetUrl, mkdtempPath)).resolves.toEqual({ filepath: expectedFilePath })
     // проверка измененного html
     await expect(readFile(expectedFilePath, 'utf-8')).resolves.toBe(expectedBody)
     // проверка наличия скачанных файлов
