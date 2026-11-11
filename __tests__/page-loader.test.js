@@ -34,7 +34,7 @@ describe('page-loader', () => {
     nock(href).get('/assets/professions/nodejs.png').reply(200, expectedImg)
 
     // проверка полученного пути
-    await expect(reqTargetUrl(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath)
+    await expect(pageLoader(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath)
     // проверка измененного html
     await expect(readFile(expectedFilePath, 'utf-8')).resolves.toBe(expectedBody)
     // проверка наличия скачанных файлов
@@ -74,8 +74,7 @@ describe('page-loader', () => {
       nock(href).get(pathname).reply(200, fakeData)
     })
 
-    await expect(reqTargetUrl(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath)
-
+    await expect(pageLoader(targetUrl, mkdtempPath)).resolves.toEqual({ filepath: expectedFilePath })
     await expect(readFile(expectedFilePath, 'utf-8')).resolves.toBe(expectedBody)
 
     for (const item of expectedFiles) {
@@ -89,12 +88,12 @@ describe('page-loader', () => {
   test('failure to load a non-existent page on the Internet', async () => {
     nock('https://ruhexlet.io').get('/courses').reply(404)
 
-    await expect(reqTargetUrl('https://ruhexlet.io/courses', mkdtempPath)).rejects.toThrow()
+    await expect(pageLoader('https://ruhexlet.io/courses', mkdtempPath)).rejects.toThrow()
   })
   // синтаксически неправильный адрес страницы
   test('failure when loading a page with a syntactically incorrect URL', async () => {
-    await expect(reqTargetUrl('https://', mkdtempPath)).rejects.toThrow()
-    await expect(reqTargetUrl('', mkdtempPath)).rejects.toThrow()
+    await expect(pageLoader('https://', mkdtempPath)).rejects.toThrow()
+    await expect(pageLoader('', mkdtempPath)).rejects.toThrow()
   })
   // измененная страница должна загрузиться, несуществующие файлы не обрабатываются
   test('must download the modified page, even if some of the resources are unavailable', async () => {
@@ -107,7 +106,7 @@ describe('page-loader', () => {
     nock(href).get('/courses').reply(200, basicBody)
     nock(href).get('/assets/professions/nodejs.png').reply(404)
 
-    await expect(reqTargetUrl(targetUrl, mkdtempPath)).resolves.toBe(expectedFilePath)
+    await expect(pageLoader(targetUrl, mkdtempPath)).resolves.toEqual({ filepath: expectedFilePath })
     await expect(readFile(expectedFilePath, 'utf-8')).resolves.toBe(expectedBody)
     await expect(readFile(expectedImgFullPath, 'utf-8')).rejects.toThrow()
   })
@@ -115,7 +114,7 @@ describe('page-loader', () => {
   // ошибка доступа при сохранении данных в системные директории
   test('access failure when saving data to the system directory', async () => {
     nock(href).get('/courses').reply(200, 'Hello, World!')
-    await expect(reqTargetUrl(targetUrl, '/bin')).rejects.toThrow()
+    await expect(pageLoader(targetUrl, '/bin')).rejects.toThrow()
   })
   // ошибка при сохранении данных в несуществующую директорию
   test('failure when saving data to a non-existent directory', async () => {
