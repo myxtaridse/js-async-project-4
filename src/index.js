@@ -75,7 +75,16 @@ export default (targetUrl, outputDir = process.cwd()) => {
       return mkdir(dirpathFiles)
         .then(() => tasks.run())
         .then(() => $.html())
-        .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => dataFilepath))
+        .then(modifiedHtml => writeFile(dataFilepath, modifiedHtml).then(() => ({ filepath: dataFilepath })))
+        .catch((err) => {
+          if (err.code === 'EACCES' || err.code === 'ENOENT') {
+            throw new Error(`Директория ${resolvedOutput} не существует или недоступна для записи.`, { cause: err })
+          }
+          else if (err.code === 'ERR_INVALID_URL') {
+            throw new Error(`Ссылка ${targetUrl} является синтаксически неверной. Попробуйте переписать ее.`, { cause: err })
+          }
+          throw err
+        })
     }).catch((err) => {
       if (axios.isAxiosError(err)) {
         if (err.response) {
