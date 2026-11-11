@@ -3,7 +3,6 @@ import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import nock from 'nock'
 import pageLoader from '../src/index.js'
-import { afterEach } from 'node:test'
 
 const getFixturePath = filename => join(resolve(), '__fixtures__', filename)
 
