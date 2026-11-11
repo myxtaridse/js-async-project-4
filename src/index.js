@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { mkdir, writeFile } from 'node:fs/promises'
 
 import axios from 'axios'
@@ -41,24 +41,27 @@ const getResources = ($, targetUrl, dirnameFiles) => {
   })
   return resources
 }
+
 const downloadResource = (resourceUrl, pathname, tagname, attribute, responseType) =>
   axios.get(resourceUrl, { responseType })
     .then(res => writeFile(pathname, res.data))
     .catch(() => {
       console.warn(`Не удалось скачать ресурс тега <${tagname}> по URL адресу "${attribute}", поскольку его не существует`)
     })
+
 const createTask = ({ tagname, attribute, responseType, resourceUrl, changeAttr }, dirpathFiles) => ({
   title: resourceUrl.href,
   task: () => downloadResource(resourceUrl, join(dirpathFiles, changeAttr), tagname, attribute, responseType),
 })
 
 export default (targetUrl, outputDir = process.cwd()) => {
+  const resolvedOutput = resolve(outputDir)
+
   const filename = parseUrl(targetUrl)
-  console.log(typeof outputDir, process.cwd())
-  const dataFilepath = join(outputDir, `${filename}.html`)
+  const dataFilepath = join(resolvedOutput, `${filename}.html`)
 
   const dirnameFiles = `${filename}_files` // папка файлов
-  const dirpathFiles = join(outputDir, dirnameFiles) // общий путь до папки
+  const dirpathFiles = join(resolvedOutput, dirnameFiles) // общий путь до папки
 
   return axios.get(targetUrl)
     .then(({ data }) => {
