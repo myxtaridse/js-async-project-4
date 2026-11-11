@@ -16,7 +16,7 @@ const filesForModified = [
 ]
 
 const getResources = ($, targetUrl, dirnameFiles) => {
-  const recources = []
+  const resources = []
   const targetUrlHost = (new URL(targetUrl)).host
   filesForModified.forEach(({ tagname, attr, responseType }) => {
     $(tagname).each((i, element) => {
@@ -36,10 +36,10 @@ const getResources = ($, targetUrl, dirnameFiles) => {
       const changeAttr = getChangeAttr(resourceUrl)
       $(element).attr(attr, `${dirnameFiles}/${changeAttr}`)
 
-      recources.push({ tagname, attribute, responseType, resourceUrl, changeAttr })
+      resources.push({ tagname, attribute, responseType, resourceUrl, changeAttr })
     })
   })
-  return recources
+  return resources
 }
 const downloadResource = (resourceUrl, pathname, tagname, attribute, responseType) =>
   axios.get(resourceUrl, { responseType })
