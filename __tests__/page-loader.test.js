@@ -1,8 +1,9 @@
-import { mkdtemp, readFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import nock from 'nock'
-import reqTargetUrl from '../src/index.js'
+import pageLoader from '../src/index.js'
+import { afterEach } from 'node:test'
 
 const getFixturePath = filename => join(resolve(), '__fixtures__', filename)
 
@@ -119,6 +120,11 @@ describe('page-loader', () => {
   // ошибка при сохранении данных в несуществующую директорию
   test('failure when saving data to a non-existent directory', async () => {
     nock(href).get('/courses').reply(200, 'Hello, World!')
-    await expect(reqTargetUrl(targetUrl, '/no_exist')).rejects.toThrow()
+    await expect(pageLoader(targetUrl, '/no_exist')).rejects.toThrow()
+  })
+
+  afterEach(async () => {
+    nock.cleanAll()
+    await rm(mkdtempPath, { recursive: true, force: true })
   })
 })
