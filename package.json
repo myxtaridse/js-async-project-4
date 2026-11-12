@@ -18,7 +18,9 @@
     "page-loader": "bin/page-loader.js"
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
