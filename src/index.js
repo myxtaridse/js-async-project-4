@@ -80,9 +80,6 @@ export default (targetUrl, outputDir = process.cwd()) => {
           if (err.code === 'EACCES' || err.code === 'ENOENT') {
             throw new Error(`Директория ${resolvedOutput} не существует или недоступна для записи.`, { cause: err })
           }
-          else if (err.code === 'ERR_INVALID_URL') {
-            throw new Error(`Ссылка ${targetUrl} является синтаксически неверной. Попробуйте переписать ее.`, { cause: err })
-          }
           throw err
         })
     }).catch((err) => {
@@ -93,6 +90,9 @@ export default (targetUrl, outputDir = process.cwd()) => {
         if (err.request) {
           throw new Error(`Не удалось найти соединение со страницей по адресу ${targetUrl}. Проверьте подключение к сети.`, { cause: err })
         }
+      }
+      else if (err.code === 'ERR_INVALID_URL') {
+        throw new Error(`Ссылка ${targetUrl} является синтаксически неверной. Попробуйте переписать ее.`, { cause: err })
       }
       throw err
     })
